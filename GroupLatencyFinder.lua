@@ -6,7 +6,7 @@ local ADDON_NAME = "GroupLatencyFinder"
 
 -- ─── OCE realm list ───────────────────────────────────────────────────────────
 -- All Oceanic realms physically hosted in Australia (US region, OCE flag).
-local OCE_REALMS = {
+local FAR_REALMS = {
     ["Barthilas"]   = true,
     ["Caelestrasz"] = true,
     ["Dath'Remar"]  = true,
@@ -18,9 +18,6 @@ local OCE_REALMS = {
     ["Nagrand"]     = true,
     ["Saurfang"]    = true,
     ["Thaurissan"]  = true,
-}
-
-local BR_REALMS = {
     ["Azralon"] = true,
     ["Gallywix"] = true,
     ["Goldrinn"] = true,
@@ -36,7 +33,7 @@ local function IsFarRealm(realm)
     if not realm or realm == "" then return false end
     -- Handle connected realms separated by " / "
     for part in realm:gmatch("[^/]+") do
-        if OCE_REALMS[part:match("^%s*(.-)%s*$")] or BR_REALMS[part:match("^%s*(.-)%s*$")] then return true end
+        if FAR_REALMS[part:match("^%s*(.-)%s*$")] then return true end
     end
     return false
 end
@@ -245,7 +242,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" then
         if arg1 ~= ADDON_NAME then return end
         GroupLatencyFinderDB = GroupLatencyFinderDB or { enabled = true }
-        print("|cFF00C8FF[GroupLatencyFinder]|r Loaded \xe2\x80\x94 OCE realm groups will be highlighted in the Group Finder. (/ocegf help)")
+        print("|cFF00C8FF[GroupLatencyFinder]|r Loaded \xe2\x80\x94 OCE/BR realm groups will show minor warning in the Group Finder. (/glf help)")
         self:UnregisterEvent("ADDON_LOADED")
 
     elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED"
@@ -258,25 +255,25 @@ end)
 
 -- ─── Slash commands ───────────────────────────────────────────────────────────
 
-SLASH_GroupLatencyFinder1 = "/ocegf"
-SLASH_GroupLatencyFinder2 = "/ocegroup"
+SLASH_GroupLatencyFinder1 = "/glf"
+SLASH_GroupLatencyFinder2 = "/grouplatencyfinder"
 
 SlashCmdList["GroupLatencyFinder"] = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")  -- trim whitespace
 
     if msg == "" or msg == "help" then
         print("|cFF00C8FF[GroupLatencyFinder]|r Commands:")
-        print("  |cFFFFD700/ocegf realms|r  \xe2\x80\x93 List all tracked OCE realms")
-        print("  |cFFFFD700/ocegf refresh|r \xe2\x80\x93 Re-scan the current Group Finder results")
-        print("  |cFFFFD700/ocegf help|r    \xe2\x80\x93 Show this message")
+        print("  |cFFFFD700/glf realms|r  \xe2\x80\x93 List all tracked OCE/BR realms")
+        print("  |cFFFFD700/glf refresh|r \xe2\x80\x93 Re-scan the current Group Finder results")
+        print("  |cFFFFD700/glf help|r    \xe2\x80\x93 Show this message")
 
     elseif msg == "realms" then
-        print("|cFF00C8FF[GroupLatencyFinder]|r Tracked OCE realms:")
+        print("|cFF00C8FF[GroupLatencyFinder]|r Tracked OCE/BR realms:")
         local sorted = {}
-        for realm in pairs(OCE_REALMS) do sorted[#sorted + 1] = realm end
+        for realm in pairs(FAR_REALMS) do sorted[#sorted + 1] = realm end
         table.sort(sorted)
         for _, realm in ipairs(sorted) do
-            print("  |cFF00C8FF\xe2\x80\xa2|r " .. realm)
+            print("  |cFF00C8FF-|r " .. realm)
         end
 
     elseif msg == "refresh" then
