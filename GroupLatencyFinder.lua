@@ -6,24 +6,7 @@ local ADDON_NAME = "GroupLatencyFinder"
 
 -- ─── OCE realm list ───────────────────────────────────────────────────────────
 -- All Oceanic realms physically hosted in Australia (US region, OCE flag).
-local FAR_REALMS = {
-    ["Barthilas"]   = true,
-    ["Caelestrasz"] = true,
-    ["Dath'Remar"]  = true,
-    ["Dreadmaul"]   = true,
-    ["Frostmourne"] = true,
-    ["Gundrak"]     = true,
-    ["Jubei'Thos"]  = true,
-    ["Khaz'goroth"] = true,
-    ["Nagrand"]     = true,
-    ["Saurfang"]    = true,
-    ["Thaurissan"]  = true,
-    ["Azralon"] = true,
-    ["Gallywix"] = true,
-    ["Goldrinn"] = true,
-    ["Nemesis"] = true,
-    ["Tol Barad"] = true,
-}
+
 
 local FAR_BADGE_COLOR = { r = 115, g = 0, b = 116, a = 1.0 }
 
@@ -242,6 +225,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" then
         if arg1 ~= ADDON_NAME then return end
         GroupLatencyFinderDB = GroupLatencyFinderDB or { enabled = true }
+        GroupLatencyFinder_LoadSavedRealms()   -- apply persisted adds/removes
         print("|cFF00C8FF[GroupLatencyFinder]|r Loaded \xe2\x80\x94 OCE/BR realm groups will show minor warning in the Group Finder. (/glf help)")
         self:UnregisterEvent("ADDON_LOADED")
 
@@ -263,10 +247,14 @@ SlashCmdList["GroupLatencyFinder"] = function(msg)
 
     if msg == "" or msg == "help" then
         print("|cFF00C8FF[GroupLatencyFinder]|r Commands:")
+        print("  |cFFFFD700/glf config|r  \xe2\x80\x93 Open the realm editor panel")
         print("  |cFFFFD700/glf realms|r  \xe2\x80\x93 List all tracked OCE/BR realms")
         print("  |cFFFFD700/glf refresh|r \xe2\x80\x93 Re-scan the current Group Finder results")
         print("  |cFFFFD700/glf help|r    \xe2\x80\x93 Show this message")
 
+    elseif msg == "config" then
+        GroupLatencyFinder_OpenSettings()
+    
     elseif msg == "realms" then
         print("|cFF00C8FF[GroupLatencyFinder]|r Tracked OCE/BR realms:")
         local sorted = {}
