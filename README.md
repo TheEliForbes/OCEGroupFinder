@@ -1,14 +1,14 @@
 # GroupLatencyFinder
 
-A lightweight World of Warcraft addon that visually identifies premade group listings in the **Group Finder** (LFG List) that are led by players on **non-NA realms** for ping purposes.
+A World of Warcraft addon that visually identifies premade group listings in the **Group Finder** (LFG List) that are led by players on **non-NA realms** for ping purposes.
+
+Disclaimer: Claude coded the base of this, but I made sure to get my grubby mits in there and fix it how I wanted. (Take this however you will)
 
 ---
 
 ## Features
 
-- 🌏 **Cyan `[OCE]` badge** on every Group Finder result card whose leader is from an OCE realm
-- **Coloured left border** on OCE group cards for quick scanning
-- **Enhanced tooltip** — hover any group to see the leader's realm name if it's OCE
+- **Purple `[FAR]` badge** on every Group Finder result card whose leader is from an OCE/BR realm
 - Slash commands to list all tracked realms
 
 ---
@@ -24,7 +24,7 @@ A lightweight World of Warcraft addon that visually identifies premade group lis
 
 ---
 
-## Tracked OCE Realms
+## Tracked OCE/BR Realms
 
 | Realm |
 |-------|
@@ -39,15 +39,19 @@ A lightweight World of Warcraft addon that visually identifies premade group lis
 | Nagrand |
 | Saurfang |
 | Thaurissan |
-
+| Azralon |
+| Gallywix |
+| Goldrinn |
+| Nemesis |
+| Tol Barad |
 ---
 
 ## Slash Commands
 
 | Command | Description |
 |---------|-------------|
-| `/ocegf` | Show help |
-| `/ocegf realms` | Print all tracked OCE realms to chat |
+| `/glf` | Show help |
+| `/glf realms` | Print all tracked OCE realms to chat |
 
 ---
 
@@ -73,7 +77,7 @@ The hooks fire on `LFG_LIST_SEARCH_RESULTS_RECEIVED` and `LFG_LIST_AVAILABILITY_
 
 ## Contributing
 
-PRs welcome! If Blizzard adds new OCE realms or renames existing ones, just update the `OCE_REALMS` table at the top of `GroupLatencyFinder.lua`.
+PRs welcome! If Blizzard adds new OCE/BR realms or renames existing ones, just update the `FAR_REALMS` table at the top of `GroupLatencyFinder.lua`.
 
 ---
 
