@@ -93,7 +93,7 @@ local function GetRow(parent)
     row.removeBtn:SetSize(22, 22)
     row.removeBtn:SetPoint("RIGHT", row, "RIGHT", -8, 0)
     row.removeBtn:SetNormalFontObject("GameFontNormalSmall")
-    row.removeBtn:SetText("|cFFFF5555\xc3\x97|r")   -- × in UTF-8
+    row.removeBtn:SetText("|cFFFF5555X|r")   -- × in UTF-8
 
     local btnBg = row.removeBtn:CreateTexture(nil, "BACKGROUND")
     btnBg:SetAllPoints(row.removeBtn)
@@ -242,7 +242,7 @@ local function BuildPanel()
 
     local titleText = titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("LEFT", titleBar, "LEFT", 12, 0)
-    titleText:SetText("|cFF00C8FFOCEGroupFinder|r  \xe2\x80\x94  Realm Editor")
+    titleText:SetText("|cFF00C8FFOCEGroupFinder|r    Realm Editor")
     titleText:SetTextColor(0.9, 0.9, 0.9)
 
     -- Close button
@@ -250,7 +250,7 @@ local function BuildPanel()
     closeBtn:SetSize(28, 28)
     closeBtn:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -6, -7)
     closeBtn:SetNormalFontObject("GameFontNormalLarge")
-    closeBtn:SetText("|cFFAAAAAA\xc3\x97|r")
+    closeBtn:SetText("|cFFAAAAAAX|r")
     closeBtn:SetScript("OnClick", function() panel:Hide() end)
 
     local closeBg = closeBtn:CreateTexture(nil, "BACKGROUND")

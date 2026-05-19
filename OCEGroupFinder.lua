@@ -170,7 +170,7 @@ local function HookButtonTooltip(button)
         -- if IsOCERealm(realm) then
         --     if GameTooltip:IsShown() then
         --         GameTooltip:AddLine(" ")
-        --         GameTooltip:AddLine("|cFF00C8FF\xF0\x9F\x8C\x8F Oceanic Realm Leader|r")
+        --         GameTooltip:AddLine("|cFF00C8FF Oceanic Realm Leader|r")
         --         GameTooltip:AddLine("Realm: " .. (realm or "Unknown"), 0.7, 0.9, 1.0)
         --         GameTooltip:Show()
         --     end
@@ -222,7 +222,7 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
         if arg1 ~= ADDON_NAME then return end
         OCEGroupFinderDB = OCEGroupFinderDB or { enabled = true }
         OCEGroupFinder_LoadSavedRealms()   -- apply persisted adds/removes
-        print("|cFF00C8FF[OCEGroupFinder]|r Loaded \xe2\x80\x94 OCE realm groups will be highlighted in the Group Finder. (/ocegf help)")
+        print("|cFF00C8FF[OCEGroupFinder]|r Loaded -- OCE realm groups will be highlighted in the Group Finder. (/ocegf help)")
         self:UnregisterEvent("ADDON_LOADED")
 
     elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED"
@@ -243,10 +243,10 @@ SlashCmdList["OCEGROUPFINDER"] = function(msg)
 
     if msg == "" or msg == "help" then
         print("|cFF00C8FF[OCEGroupFinder]|r Commands:")
-        print("  |cFFFFD700/ocegf config|r  \xe2\x80\x93 Open the realm editor panel")
-        print("  |cFFFFD700/ocegf realms|r  \xe2\x80\x93 List all tracked OCE realms in chat")
-        print("  |cFFFFD700/ocegf refresh|r \xe2\x80\x93 Re-scan the current Group Finder results")
-        print("  |cFFFFD700/ocegf help|r    \xe2\x80\x93 Show this message")
+        print("  |cFFFFD700/ocegf config|r  -- Open the realm editor panel")
+        print("  |cFFFFD700/ocegf realms|r  -- List all tracked OCE realms in chat")
+        print("  |cFFFFD700/ocegf refresh|r -- Re-scan the current Group Finder results")
+        print("  |cFFFFD700/ocegf help|r    -- Show this message")
 
     elseif msg == "config" or msg == "settings" then
         OCEGroupFinder_OpenSettings()
@@ -257,7 +257,7 @@ SlashCmdList["OCEGROUPFINDER"] = function(msg)
         for realm in pairs(OCE_REALMS) do sorted[#sorted + 1] = realm end
         table.sort(sorted)
         for _, realm in ipairs(sorted) do
-            print("  |cFF00C8FF\xe2\x80\xa2|r " .. realm)
+            print("  |cFF00C8FF-|r " .. realm)
         end
 
     elseif msg == "refresh" then
