@@ -20,15 +20,23 @@ local OCE_REALMS = {
     ["Thaurissan"]  = true,
 }
 
-local OCE_BADGE_COLOR = { r = 0.0, g = 0.78, b = 1.0, a = 1.0 }
+local BR_REALMS = {
+    ["Azralon"] = true,
+    ["Gallywix"] = true,
+    ["Goldrinn"] = true,
+    ["Nemesis"] = true,
+    ["Tol Barad"] = true,
+}
+
+local FAR_BADGE_COLOR = { r = 115, g = 0, b = 116, a = 1.0 }
 
 -- ─── Utilities ────────────────────────────────────────────────────────────────
 
-local function IsOCERealm(realm)
+local function IsFarRealm(realm)
     if not realm or realm == "" then return false end
     -- Handle connected realms separated by " / "
     for part in realm:gmatch("[^/]+") do
-        if OCE_REALMS[part:match("^%s*(.-)%s*$")] then return true end
+        if OCE_REALMS[part:match("^%s*(.-)%s*$")] or BR_REALMS[part:match("^%s*(.-)%s*$")] then return true end
     end
     return false
 end
@@ -44,30 +52,33 @@ end
 -- ─── Per-button badge elements ────────────────────────────────────────────────
 
 local function EnsureBadge(button)
-    if button._oceLabel then return button._oceLabel end
+    if button._farLabel then return button._farLabel end
     local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     label:SetPoint("TOPRIGHT", button, "TOPRIGHT", -6, -4)
-    label:SetText("|cFF00C8FF[OCE]|r")
+    -- :SetText("|cFF00C8FF[FAR]|r") resulted in light blue somehow, set color below
+    label:SetTextColor(FAR_BADGE_COLOR.r, FAR_BADGE_COLOR.g, FAR_BADGE_COLOR.b, FAR_BADGE_COLOR.a)
+    label:SetText("[FAR]")
     label:Hide()
-    button._oceLabel = label
+    button._farLabel = label
     return label
 end
 
-local function EnsureBorder(button)
-    if button._oceBorder then return button._oceBorder end
-    local tex = button:CreateTexture(nil, "BACKGROUND")
-    tex:SetWidth(4)
-    tex:SetPoint("TOPLEFT",    button, "TOPLEFT",    0, 0)
-    tex:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 0, 0)
-    tex:SetColorTexture(OCE_BADGE_COLOR.r, OCE_BADGE_COLOR.g, OCE_BADGE_COLOR.b, OCE_BADGE_COLOR.a)
-    tex:Hide()
-    button._oceBorder = tex
-    return tex
-end
+-- Border functionality draws the eye to a group im not about, remove it for now.
+-- local function EnsureBorder(button)
+--     if button._oceBorder then return button._oceBorder end
+--     local tex = button:CreateTexture(nil, "BACKGROUND")
+--     tex:SetWidth(4)
+--     tex:SetPoint("TOPLEFT",    button, "TOPLEFT",    0, 0)
+--     tex:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 0, 0)
+--     tex:SetColorTexture(FAR_BADGE_COLOR.r, FAR_BADGE_COLOR.g, FAR_BADGE_COLOR.b, FAR_BADGE_COLOR.a)
+--     tex:Hide()
+--     button._oceBorder = tex
+--     return tex
+-- end
 
-local function SetOCEBadge(button, show)
+local function SetFarBadge(button, show)
     local label  = EnsureBadge(button)
-    local border = EnsureBorder(button)
+    -- local border = EnsureBorder(button)
     if show then
         label:Show()
         border:Show()
@@ -82,18 +93,18 @@ end
 local function EvaluateButton(button)
     local resultID = button.resultID
     if not resultID then
-        SetOCEBadge(button, false)
+        SetFarBadge(button, false)
         return
     end
 
     local info = C_LFGList.GetSearchResultInfo(resultID)
     if not info then
-        SetOCEBadge(button, false)
+        SetFarBadge(button, false)
         return
     end
 
     local realm = GetRealmFromNameRealm(info.leaderName)
-    SetOCEBadge(button, IsOCERealm(realm))
+    SetFarBadge(button, IsFarRealm(realm))
 end
 
 -- ─── Button discovery & hooking ───────────────────────────────────────────────
@@ -179,14 +190,15 @@ local function HookButtonTooltip(button)
         local info = C_LFGList.GetSearchResultInfo(resultID)
         if not info then return end
         local realm = GetRealmFromNameRealm(info.leaderName)
-        if IsOCERealm(realm) then
-            if GameTooltip:IsShown() then
-                GameTooltip:AddLine(" ")
-                GameTooltip:AddLine("|cFF00C8FF\xF0\x9F\x8C\x8F Oceanic Realm Leader|r")
-                GameTooltip:AddLine("Realm: " .. (realm or "Unknown"), 0.7, 0.9, 1.0)
-                GameTooltip:Show()
-            end
-        end
+        -- This added text is useless so i removed it.
+        -- if IsFarRealm(realm) then
+        --     if GameTooltip:IsShown() then
+        --         GameTooltip:AddLine(" ")
+        --         GameTooltip:AddLine("|cFF00C8FF\xF0\x9F\x8C\x8F Oceanic Realm Leader|r")
+        --         GameTooltip:AddLine("Realm: " .. (realm or "Unknown"), 0.7, 0.9, 1.0)
+        --         GameTooltip:Show()
+        --     end
+        -- end
     end)
 end
 
