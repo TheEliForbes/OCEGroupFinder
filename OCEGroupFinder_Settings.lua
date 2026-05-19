@@ -401,6 +401,25 @@ local function BuildPanel()
     divider2:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", 0, 26)
     divider2:SetColorTexture(0.0, 0.78, 1.0, 0.15)
 
+    -- ── Border toggle checkbox ───────────────────────────────────────────────
+
+    local borderCheck = CreateFrame("CheckButton", ADDON_NAME .. "BorderCheck", panel,
+                                    "UICheckButtonTemplate")
+    borderCheck:SetSize(24, 24)
+    borderCheck:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 8, 2)
+    -- Label sits to the right of the checkbox
+    local borderCheckLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    borderCheckLabel:SetPoint("LEFT", borderCheck, "RIGHT", 2, 0)
+    borderCheckLabel:SetText("Show border")
+    borderCheckLabel:SetTextColor(0.75, 0.75, 0.75)
+    panel.borderCheck = borderCheck
+
+    borderCheck:SetScript("OnClick", function(self)
+        local checked = self:GetChecked()
+        OCEGroupFinderDB.showBorder = checked and true or false
+        OCEGroupFinder_RefreshAllBorders()
+    end)
+
     -- ── Reset-to-defaults button ──────────────────────────────────────────────
 
     local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
@@ -431,6 +450,9 @@ end
 function OCEGroupFinder_OpenSettings()
     BuildPanel()
     RenderList()
+    -- Sync checkbox to current saved setting (default true if not yet set)
+    local borderOn = (OCEGroupFinderDB == nil) or (OCEGroupFinderDB.showBorder ~= false)
+    panel.borderCheck:SetChecked(borderOn)
     panel:Show()
     panel:Raise()
 end

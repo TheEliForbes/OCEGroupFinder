@@ -57,10 +57,28 @@ local function SetOCEBadge(button, show)
     local border = EnsureBorder(button)
     if show then
         label:Show()
-        border:Show()
+        -- Respect the border toggle; default on if DB not yet loaded
+        local borderEnabled = (OCEGroupFinderDB == nil) or (OCEGroupFinderDB.showBorder ~= false)
+        if borderEnabled then border:Show() else border:Hide() end
     else
         label:Hide()
         border:Hide()
+    end
+end
+
+-- Called by the settings panel when the border toggle changes,
+-- so already-visible buttons update immediately without a full rescan.
+function OCEGroupFinder_RefreshAllBorders()
+    local borderEnabled = OCEGroupFinderDB and (OCEGroupFinderDB.showBorder ~= false)
+    -- Walk every button we have ever hooked
+    for button in pairs(hookedButtons) do
+        if button._oceBorder then
+            if button._oceLabel and button._oceLabel:IsShown() then
+                -- Badge is visible → border follows the setting
+                if borderEnabled then button._oceBorder:Show()
+                else                  button._oceBorder:Hide() end
+            end
+        end
     end
 end
 
@@ -220,9 +238,10 @@ eventFrame:RegisterEvent("LFG_LIST_SEARCH_RESULT_UPDATED")
 eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" then
         if arg1 ~= ADDON_NAME then return end
-        OCEGroupFinderDB = OCEGroupFinderDB or { enabled = true }
+        OCEGroupFinderDB = OCEGroupFinderDB or { enabled = true, showBorder = true }
+        if OCEGroupFinderDB.showBorder == nil then OCEGroupFinderDB.showBorder = true end
         OCEGroupFinder_LoadSavedRealms()   -- apply persisted adds/removes
-        print("|cFF00C8FF[OCEGroupFinder]|r Loaded -- OCE realm groups will be highlighted in the Group Finder. (/ocegf help)")
+        print("|cFF00C8FF[OCEGroupFinder]|r Loaded \xe2\x80\x94 OCE realm groups will be highlighted in the Group Finder. (/ocegf help)")
         self:UnregisterEvent("ADDON_LOADED")
 
     elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED"
