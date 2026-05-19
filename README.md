@@ -90,7 +90,7 @@ The hooks fire on `LFG_LIST_SEARCH_RESULTS_RECEIVED` and `LFG_LIST_AVAILABILITY_
 
 ## Contributing
 
-Feel free top open up an issue, or yell at me when I'm live at twitch.tv/zarroe
+Feel free top open up an issue, or yell at me when I'm live on [Twitch](https://twitch.tv/zarroe)
 
 ---
 
