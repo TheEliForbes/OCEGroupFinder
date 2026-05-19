@@ -1,38 +1,26 @@
--- GroupLatencyFinder_Settings.lua
--- Settings panel: a draggable frame listing all OCE/BR realms with add / remove controls.
--- Opens via  /glf config
+-- OCEGroupFinder_Settings.lua
+-- Settings panel: a draggable frame listing all OCE realms with add / remove controls.
+-- Opens via  /ocegf config  (or  /ocegf settings)
 -- Compatible with World of Warcraft: Midnight (patch 12.0.5, interface 120005)
 
-local ADDON_NAME   = "GroupLatencyFinder"
+local ADDON_NAME   = "OCEGroupFinder"
 local PANEL_WIDTH  = 340
 local PANEL_HEIGHT = 480
 local ROW_HEIGHT   = 26
 local MAX_VISIBLE  = 13   -- rows shown without scrolling
 
 -- ─── Shared realm table (global so both files can access it) ─────────────────
--- This file loads first (see .toc). GroupLatencyFinder.lua reads/writes this table.
-FAR_REALMS = {}
+-- This file loads first (see .toc). OCEGroupFinder.lua reads/writes this table.
+OCE_REALMS = {}   -- populated below and persisted via SavedVariables
+
 local DEFAULT_REALMS = {
-    "Barthilas",
-    "Caelestrasz",
-    "Dath'Remar",
-    "Dreadmaul",
-    "Frostmourne",
-    "Gundrak",
-    "Jubei'Thos",
-    "Khaz'goroth",
-    "Nagrand",
-    "Saurfang",
+    "Barthilas", "Caelestrasz", "Dath'Remar", "Dreadmaul", "Frostmourne",
+    "Gundrak",   "Jubei'Thos",  "Khaz'goroth", "Nagrand",  "Saurfang",
     "Thaurissan",
-    "Azralon",
-    "Gallywix",
-    "Goldrinn",
-    "Nemesis",
-    "Tol Barad",
 }
 
--- Seed FAR_REALMS with defaults immediately so it's ready before ADDON_LOADED.
-for _, r in ipairs(DEFAULT_REALMS) do FAR_REALMS[r] = true end
+-- Seed OCE_REALMS with defaults immediately so it's ready before ADDON_LOADED.
+for _, r in ipairs(DEFAULT_REALMS) do OCE_REALMS[r] = true end
 
 -- Forward-declared so the panel builder can reference it
 local panel
@@ -136,7 +124,7 @@ local scrollOffset = 0   -- index of first visible realm (0-based)
 
 local function GetSortedRealms()
     local list = {}
-    for realm in pairs(FAR_REALMS) do list[#list + 1] = realm end
+    for realm in pairs(OCE_REALMS) do list[#list + 1] = realm end
     table.sort(list)
     return list
 end
@@ -185,12 +173,12 @@ local function RenderList()
 
         local capturedRealm = realm
         row.removeBtn:SetScript("OnClick", function()
-            FAR_REALMS[capturedRealm] = nil
+            OCE_REALMS[capturedRealm] = nil
             -- Persist to SavedVariables
-            GroupLatencyFinderDB.customRealms = GroupLatencyFinderDB.customRealms or {}
-            GroupLatencyFinderDB.removedRealms = GroupLatencyFinderDB.removedRealms or {}
-            GroupLatencyFinderDB.removedRealms[capturedRealm] = true
-            GroupLatencyFinderDB.customRealms[capturedRealm]  = nil
+            OCEGroupFinderDB.customRealms = OCEGroupFinderDB.customRealms or {}
+            OCEGroupFinderDB.removedRealms = OCEGroupFinderDB.removedRealms or {}
+            OCEGroupFinderDB.removedRealms[capturedRealm] = true
+            OCEGroupFinderDB.customRealms[capturedRealm]  = nil
             scrollOffset = math.max(0, math.min(scrollOffset, #GetSortedRealms() - MAX_VISIBLE))
             RenderList()
             panel.countLabel:SetText(#GetSortedRealms() .. " realms")
@@ -254,7 +242,7 @@ local function BuildPanel()
 
     local titleText = titleBar:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("LEFT", titleBar, "LEFT", 12, 0)
-    titleText:SetText("|cFF00C8FFGroupLatencyFinder|r  \xe2\x80\x94  Realm Editor")
+    titleText:SetText("|cFF00C8FFOCEGroupFinder|r  \xe2\x80\x94  Realm Editor")
     titleText:SetTextColor(0.9, 0.9, 0.9)
 
     -- Close button
@@ -309,15 +297,15 @@ local function BuildPanel()
     local function DoAdd()
         local raw = NormaliseRealm(inputBox:GetText())
         if raw == "" then return end
-        if FAR_REALMS[raw] then
+        if OCE_REALMS[raw] then
             panel.statusLabel:SetText("|cFFFFCC00'" .. raw .. "' is already in the list.|r")
             return
         end
-        FAR_REALMS[raw] = true
-        GroupLatencyFinderDB.customRealms  = GroupLatencyFinderDB.customRealms or {}
-        GroupLatencyFinderDB.removedRealms = GroupLatencyFinderDB.removedRealms or {}
-        GroupLatencyFinderDB.customRealms[raw]  = true
-        GroupLatencyFinderDB.removedRealms[raw] = nil
+        OCE_REALMS[raw] = true
+        OCEGroupFinderDB.customRealms  = OCEGroupFinderDB.customRealms or {}
+        OCEGroupFinderDB.removedRealms = OCEGroupFinderDB.removedRealms or {}
+        OCEGroupFinderDB.customRealms[raw]  = true
+        OCEGroupFinderDB.removedRealms[raw] = nil
         inputBox:SetText("")
         placeholder:Show()
         panel.statusLabel:SetText("|cFF00C8FFAdded '|r" .. raw .. "|cFF00C8FF'.|r")
@@ -421,13 +409,13 @@ local function BuildPanel()
     resetBtn:SetText("Reset to Defaults")
     resetBtn:SetScript("OnClick", function()
         -- Wipe custom additions and removals; restore built-in list
-        GroupLatencyFinderDB.customRealms  = {}
-        GroupLatencyFinderDB.removedRealms = {}
-        -- Re-populate FAR_REALMS from the defaults embedded in this file
-        for k in pairs(FAR_REALMS) do FAR_REALMS[k] = nil end
-        for _, r in ipairs(DEFAULT_REALMS) do FAR_REALMS[r] = true end
+        OCEGroupFinderDB.customRealms  = {}
+        OCEGroupFinderDB.removedRealms = {}
+        -- Re-populate OCE_REALMS from the defaults embedded in this file
+        for k in pairs(OCE_REALMS) do OCE_REALMS[k] = nil end
+        for _, r in ipairs(DEFAULT_REALMS) do OCE_REALMS[r] = true end
         scrollOffset = 0
-        panel.statusLabel:SetText("|cFF00C8FFReset to default OCE/BR realm list.|r")
+        panel.statusLabel:SetText("|cFF00C8FFReset to default OCE realm list.|r")
         RenderList()
     end)
 
@@ -440,34 +428,34 @@ end
 
 -- ─── Public API ───────────────────────────────────────────────────────────────
 
-function GroupLatencyFinder_OpenSettings()
+function OCEGroupFinder_OpenSettings()
     BuildPanel()
     RenderList()
     panel:Show()
     panel:Raise()
 end
 
-function GroupLatencyFinder_CloseSettings()
+function OCEGroupFinder_CloseSettings()
     if panel then panel:Hide() end
 end
 
 -- ─── Persist custom realms across sessions ────────────────────────────────────
--- Called from the main file's ADDON_LOADED handler (see GroupLatencyFinder.lua)
+-- Called from the main file's ADDON_LOADED handler (see OCEGroupFinder.lua)
 
-function GroupLatencyFinder_LoadSavedRealms()
-    local db = GroupLatencyFinderDB
+function OCEGroupFinder_LoadSavedRealms()
+    local db = OCEGroupFinderDB
     if not db then return end
 
     -- Remove realms the user deleted
     if db.removedRealms then
         for realm in pairs(db.removedRealms) do
-            FAR_REALMS[realm] = nil
+            OCE_REALMS[realm] = nil
         end
     end
     -- Add custom realms the user added
     if db.customRealms then
         for realm in pairs(db.customRealms) do
-            FAR_REALMS[realm] = true
+            OCE_REALMS[realm] = true
         end
     end
 end

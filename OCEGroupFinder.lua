@@ -1,22 +1,21 @@
--- GroupLatencyFinder.lua
+-- OCEGroupFinder.lua
 -- Highlights premade Group Finder listings led by players on OCE (Oceanic) realms.
 -- Compatible with World of Warcraft: Midnight (patch 12.0.5, interface 120005)
 
-local ADDON_NAME = "GroupLatencyFinder"
+local ADDON_NAME = "OCEGroupFinder"
 
--- ─── OCE realm list ───────────────────────────────────────────────────────────
--- All Oceanic realms physically hosted in Australia (US region, OCE flag).
+-- OCE_REALMS is declared and seeded in OCEGroupFinder_Settings.lua (loaded first).
+-- This file reads and writes the shared global directly.
 
-
-local FAR_BADGE_COLOR = { r = 115, g = 0, b = 116, a = 1.0 }
+local OCE_BADGE_COLOR = { r = 0.0, g = 0.78, b = 1.0, a = 1.0 }
 
 -- ─── Utilities ────────────────────────────────────────────────────────────────
 
-local function IsFarRealm(realm)
+local function IsOCERealm(realm)
     if not realm or realm == "" then return false end
     -- Handle connected realms separated by " / "
     for part in realm:gmatch("[^/]+") do
-        if FAR_REALMS[part:match("^%s*(.-)%s*$")] then return true end
+        if OCE_REALMS[part:match("^%s*(.-)%s*$")] then return true end
     end
     return false
 end
@@ -32,33 +31,30 @@ end
 -- ─── Per-button badge elements ────────────────────────────────────────────────
 
 local function EnsureBadge(button)
-    if button._farLabel then return button._farLabel end
+    if button._oceLabel then return button._oceLabel end
     local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     label:SetPoint("TOPRIGHT", button, "TOPRIGHT", -6, -4)
-    -- :SetText("|cFF00C8FF[FAR]|r") resulted in light blue somehow, set color below
-    label:SetTextColor(FAR_BADGE_COLOR.r, FAR_BADGE_COLOR.g, FAR_BADGE_COLOR.b, FAR_BADGE_COLOR.a)
-    label:SetText("[FAR]")
+    label:SetText("|cFF00C8FF[OCE]|r")
     label:Hide()
-    button._farLabel = label
+    button._oceLabel = label
     return label
 end
 
--- Border functionality draws the eye to a group im not about, remove it for now.
--- local function EnsureBorder(button)
---     if button._oceBorder then return button._oceBorder end
---     local tex = button:CreateTexture(nil, "BACKGROUND")
---     tex:SetWidth(4)
---     tex:SetPoint("TOPLEFT",    button, "TOPLEFT",    0, 0)
---     tex:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 0, 0)
---     tex:SetColorTexture(FAR_BADGE_COLOR.r, FAR_BADGE_COLOR.g, FAR_BADGE_COLOR.b, FAR_BADGE_COLOR.a)
---     tex:Hide()
---     button._oceBorder = tex
---     return tex
--- end
+local function EnsureBorder(button)
+    if button._oceBorder then return button._oceBorder end
+    local tex = button:CreateTexture(nil, "BACKGROUND")
+    tex:SetWidth(4)
+    tex:SetPoint("TOPLEFT",    button, "TOPLEFT",    0, 0)
+    tex:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 0, 0)
+    tex:SetColorTexture(OCE_BADGE_COLOR.r, OCE_BADGE_COLOR.g, OCE_BADGE_COLOR.b, OCE_BADGE_COLOR.a)
+    tex:Hide()
+    button._oceBorder = tex
+    return tex
+end
 
-local function SetFarBadge(button, show)
+local function SetOCEBadge(button, show)
     local label  = EnsureBadge(button)
-    -- local border = EnsureBorder(button)
+    local border = EnsureBorder(button)
     if show then
         label:Show()
         border:Show()
@@ -73,18 +69,18 @@ end
 local function EvaluateButton(button)
     local resultID = button.resultID
     if not resultID then
-        SetFarBadge(button, false)
+        SetOCEBadge(button, false)
         return
     end
 
     local info = C_LFGList.GetSearchResultInfo(resultID)
     if not info then
-        SetFarBadge(button, false)
+        SetOCEBadge(button, false)
         return
     end
 
     local realm = GetRealmFromNameRealm(info.leaderName)
-    SetFarBadge(button, IsFarRealm(realm))
+    SetOCEBadge(button, IsOCERealm(realm))
 end
 
 -- ─── Button discovery & hooking ───────────────────────────────────────────────
@@ -170,8 +166,8 @@ local function HookButtonTooltip(button)
         local info = C_LFGList.GetSearchResultInfo(resultID)
         if not info then return end
         local realm = GetRealmFromNameRealm(info.leaderName)
-        -- This added text is useless so i removed it.
-        -- if IsFarRealm(realm) then
+        -- These lines are just visual noise
+        -- if IsOCERealm(realm) then
         --     if GameTooltip:IsShown() then
         --         GameTooltip:AddLine(" ")
         --         GameTooltip:AddLine("|cFF00C8FF\xF0\x9F\x8C\x8F Oceanic Realm Leader|r")
@@ -224,9 +220,9 @@ eventFrame:RegisterEvent("LFG_LIST_SEARCH_RESULT_UPDATED")
 eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" then
         if arg1 ~= ADDON_NAME then return end
-        GroupLatencyFinderDB = GroupLatencyFinderDB or { enabled = true }
-        GroupLatencyFinder_LoadSavedRealms()   -- apply persisted adds/removes
-        print("|cFF00C8FF[GroupLatencyFinder]|r Loaded \xe2\x80\x94 OCE/BR realm groups will show minor warning in the Group Finder. (/glf help)")
+        OCEGroupFinderDB = OCEGroupFinderDB or { enabled = true }
+        OCEGroupFinder_LoadSavedRealms()   -- apply persisted adds/removes
+        print("|cFF00C8FF[OCEGroupFinder]|r Loaded \xe2\x80\x94 OCE realm groups will be highlighted in the Group Finder. (/ocegf help)")
         self:UnregisterEvent("ADDON_LOADED")
 
     elseif event == "LFG_LIST_SEARCH_RESULTS_RECEIVED"
@@ -239,36 +235,36 @@ end)
 
 -- ─── Slash commands ───────────────────────────────────────────────────────────
 
-SLASH_GroupLatencyFinder1 = "/glf"
-SLASH_GroupLatencyFinder2 = "/grouplatencyfinder"
+SLASH_OCEGROUPFINDER1 = "/ocegf"
+SLASH_OCEGROUPFINDER2 = "/ocegroup"
 
-SlashCmdList["GroupLatencyFinder"] = function(msg)
+SlashCmdList["OCEGROUPFINDER"] = function(msg)
     msg = (msg or ""):lower():match("^%s*(.-)%s*$")  -- trim whitespace
 
     if msg == "" or msg == "help" then
-        print("|cFF00C8FF[GroupLatencyFinder]|r Commands:")
-        print("  |cFFFFD700/glf config|r  \xe2\x80\x93 Open the realm editor panel")
-        print("  |cFFFFD700/glf realms|r  \xe2\x80\x93 List all tracked OCE/BR realms")
-        print("  |cFFFFD700/glf refresh|r \xe2\x80\x93 Re-scan the current Group Finder results")
-        print("  |cFFFFD700/glf help|r    \xe2\x80\x93 Show this message")
+        print("|cFF00C8FF[OCEGroupFinder]|r Commands:")
+        print("  |cFFFFD700/ocegf config|r  \xe2\x80\x93 Open the realm editor panel")
+        print("  |cFFFFD700/ocegf realms|r  \xe2\x80\x93 List all tracked OCE realms in chat")
+        print("  |cFFFFD700/ocegf refresh|r \xe2\x80\x93 Re-scan the current Group Finder results")
+        print("  |cFFFFD700/ocegf help|r    \xe2\x80\x93 Show this message")
 
-    elseif msg == "config" then
-        GroupLatencyFinder_OpenSettings()
-    
+    elseif msg == "config" or msg == "settings" then
+        OCEGroupFinder_OpenSettings()
+
     elseif msg == "realms" then
-        print("|cFF00C8FF[GroupLatencyFinder]|r Tracked OCE/BR realms:")
+        print("|cFF00C8FF[OCEGroupFinder]|r Tracked OCE realms:")
         local sorted = {}
-        for realm in pairs(FAR_REALMS) do sorted[#sorted + 1] = realm end
+        for realm in pairs(OCE_REALMS) do sorted[#sorted + 1] = realm end
         table.sort(sorted)
         for _, realm in ipairs(sorted) do
-            print("  |cFF00C8FF-|r " .. realm)
+            print("  |cFF00C8FF\xe2\x80\xa2|r " .. realm)
         end
 
     elseif msg == "refresh" then
         FullScanButtons()
-        print("|cFF00C8FF[GroupLatencyFinder]|r Results refreshed.")
+        print("|cFF00C8FF[OCEGroupFinder]|r Results refreshed.")
 
     else
-        print("|cFF00C8FF[GroupLatencyFinder]|r Unknown command. Type |cFFFFD700/ocegf help|r for options.")
+        print("|cFF00C8FF[OCEGroupFinder]|r Unknown command. Type |cFFFFD700/ocegf help|r for options.")
     end
 end

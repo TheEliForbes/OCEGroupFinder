@@ -1,0 +1,9 @@
+## Interface: 120005
+## Title: OCE Group Finder
+## Notes: Highlights premade groups led by players on OCE (Oceanic) realms in the Group Finder.
+## Author: YourName
+## Version: 1.1.0
+## SavedVariables: OCEGroupFinderDB
+
+OCEGroupFinder_Settings.lua
+OCEGroupFinder.lua

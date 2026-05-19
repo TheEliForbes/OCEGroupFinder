@@ -1,8 +1,0 @@
-## Interface: 120005
-## Title: Group Latency Finder
-## Notes: Highlights premade groups led by players on non-NA realms in the Group Finder.
-## Author: Zarroe
-## Version: 1.0.0
-## SavedVariables: GroupLatencyFinderDB
-
-GroupLatencyFinder.lua
