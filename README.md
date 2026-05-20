@@ -8,13 +8,13 @@ Disclaimer: I vibe coded this with Claude just to see if I could, but I made sur
 
 ## Features
 
-- 🌏 **Cyan `[OCE]` badge** on every Group Finder result card whose leader is from an OCE realm
+![screenshot](./ocdgfss.png)
 
-- **Coloured left border** on OCE group cards for quick scanning
+- Cyan `[OCE]` badge on results whose leader is from an OCE realm
 
-- **Enhanced tooltip** — hover any group to see the leader's realm name if it's OCE
+- Toggleable colored left border on OCE group cards for quick scanning
 
-- Slash commands to list all tracked realms
+- UI to add/remove realms at your own discretion
 
 ---
 
